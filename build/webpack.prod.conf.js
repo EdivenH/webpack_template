@@ -16,7 +16,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 //一个压缩css的webpack插件！
 const OptimizeCSSPlugin = require("optimize-css-assets-webpack-plugin");
 //一个拷贝文件的webpack插件！
-//const CopyWebpackPlugin = require("copy-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const cleanWebpackPlugin = require('clean-webpack-plugin');
@@ -78,34 +78,43 @@ const prodConf = merge(baseConf, {
     ]
   },
   optimization: {
-    runtimeChunk: false,
-    minimizer: [
-      new UglifyJsPlugin({
-        cache: true,
-        parallel: true,
-        sourceMap: true 
-      }),
-      new OptimizeCSSPlugin({ })
-    ],
+    //runtimeChunk: false,
+    // minimizer: [
+    //   new UglifyJsPlugin({
+    //     cache: true,
+    //     parallel: true,
+    //     sourceMap: true 
+    //   }),
+    //   new OptimizeCSSPlugin({ })
+    // ],
     splitChunks: {
       name: false,
       cacheGroups: {
         vendor: {
           name: 'vendor',
           chunks: 'initial',
-          priority: -10,
+          // priority: -10,
           reuseExistingChunk: false,
           test: /[\\/]node_modules[\\/]/
         },
-        styles: {
-          name: 'styles',
-          test: /\.(css|scss)$/,
-          chunks: "all",
-          minChunks: 1,
-          reuseExistingChunk: true,
-          enforce: true
+        // styles: {
+        //   name: 'styles',
+        //   test: /\.(css|scss)$/,
+        //   chunks: "all",
+        //   minChunks: 1,
+        //   reuseExistingChunk: true,
+        //   enforce: true
+        // }
+        commons: {
+          chunks: 'async',
+          name: 'commons-async',
+          minSize: 0,
+          minChunks: 2
         }
       }
+    },
+    runtimeChunk: {
+      name: 'runtime',
     }
   },
   plugins: [
@@ -120,7 +129,7 @@ const prodConf = merge(baseConf, {
     //   }
     // }),
 
-    new cleanWebpackPlugin(['dist']),
+    new cleanWebpackPlugin(['../dist']),
 
     new MiniCssExtractPlugin({
       filename: assetsPath("css/[name].[contenthash].css"),
@@ -174,18 +183,18 @@ const prodConf = merge(baseConf, {
     // }),
 
     //将整个文件复制到构建输出指定目录下
-    // new CopyWebpackPlugin([
-    //   {
-    //     from: path.resolve(__dirname, "../static"),
-    //     to: prodConfig.staticPath,
-    //     ignore: [".*"]
-    //   }
-    // ]),
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, "../static"),
+        to: prodConfig.staticPath,
+        ignore: [".*"]
+      }
+    ]),
 
     //生成html
     new HtmlWebpackPlugin({
       filename: path.resolve(__dirname, "../dist/index.html"),
-      template: "index.html",
+      template: path.join(__dirname, '../index.html'),
       // favicon: path.resolve(__dirname, "../favicon.ico"),
       favicon: './favicon.ico',
       //js资源插入位置,true表示插入到body元素底部
@@ -200,7 +209,8 @@ const prodConf = merge(baseConf, {
         removeAttributeQuotes: true
       },
       //根据依赖引入chunk
-      chunksSortMode: "dependency"
+      //chunksSortMode: "dependency"
+      chunksSortMode: "none"
     })
   ]
 });

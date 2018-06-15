@@ -13,6 +13,7 @@ const merge = require("webpack-merge");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 //一个编译提示的webpack插件！
 const FriendlyErrorsPlugin = require("friendly-errors-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 //发送系统通知的一个node模块！
 const notifier = require("node-notifier");
 //将webpack基本配置与开发环境配置合并！
@@ -125,11 +126,18 @@ const devConf = merge(baseConf, {
     new HtmlWebpackPlugin({
       title: "hello,xc-cli!",
       filename: "index.html",
-      template: "index.html",
+      template: path.join(__dirname, '../index.html'),
       //js资源插入位置,true表示插入到body元素底部
       inject: true
     }),
-
+        //将整个文件复制到构建输出指定目录下
+        new CopyWebpackPlugin([
+          {
+            from: path.resolve(__dirname, "../static"),
+            to: 'static',
+            ignore: [".*"]
+          }
+        ]),
     //编译提示插件
     new FriendlyErrorsPlugin({
       //编译成功提示！

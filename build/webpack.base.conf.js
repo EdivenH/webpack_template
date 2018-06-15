@@ -18,7 +18,9 @@ function assetsPath(_path) {
 
 module.exports = {
   //项目入口文件->webpack从此处开始构建！
-  entry: path.resolve(__dirname, "../src/main.js"),
+  entry: {
+    main: path.resolve(__dirname, "../src/main.js"),
+  },
   //配置模块如何被解析
   resolve: {
     //自动解析文件扩展名(补全文件后缀)(从左->右)
@@ -43,9 +45,6 @@ module.exports = {
         test: /\.js$/,
         use: {
           loader: "babel-loader",
-          options: {
-            presets: ['env']
-          }
         },
         include: resolve("src"),
       },
@@ -53,7 +52,7 @@ module.exports = {
       //大于limit字节的会调用file-loader进行处理！
       //图片一般发布后都是长缓存,故此处文件名加入hash做版本区分!
       {
-        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+        test: /\.(png|jpe?g|gif|svg|tff|woff)(\?.*)?$/,
         loader: "url-loader",
         options: {
           limit: 8192,
